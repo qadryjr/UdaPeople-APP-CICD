@@ -330,7 +330,14 @@ jobs:
       - checkout
       - node/install-packages:
          app-dir: ~/project/frontend
-
+      - run: |
+          if [ -e yarn.lock ]; then
+          yarn install --frozen-lockfile
+          elif [ -e package-lock.json ]; then
+          npm ci
+          else
+          npm i
+          fi
       - run:
           command:
             npm test
