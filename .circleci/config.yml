@@ -34,7 +34,7 @@ version: 2.1
             
 jobs:
 
-  build-frontend:
+  Build-frontend:
     docker:
       - image: cimg/node:13.8.0
     steps:
@@ -49,7 +49,7 @@ jobs:
           paths: [frontend/node_modules]
           key: frontend-pack
 
-  build-backend:
+  Build-backend:
     docker:
       - image: cimg/node:13.8.0
     steps:
@@ -66,21 +66,38 @@ jobs:
           paths: [backend/node_modules]
           key: backend-pack
 
-  # test-frontend:
-  #   docker:
-  #     # Docker image here
-  #   steps:
-  #     # Checkout code from git
-  #     # Restore from cache
-  #     # Your job code here
+  UnitTest-frontend:
+    docker:
+      docker:
+      - image: cimg/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [frontend-pack]
+      - run:
+          name: UnitTest-frontend
+          command: |
+            cd frontend
+            npm install
+            npm test
+    
                 
-#   test-backend:
-#     docker:
-#       # Docker image here
-#     steps:
-#       # Checkout code from git
-#       # Restore from cache
-#       # Your job code here
+  UnitTest-backend:
+    docker:
+      - image: cimg/node:13.8.0
+    steps:
+      - checkout
+      - restore_cache:
+          keys: [backend-pack]
+      - run:
+          name: UnitTest-backend
+          command: |
+             cd backend
+             npm install
+             npm test
+      - save_cache:
+          paths: [backend/node_modules]
+          key: backend-pack
             
 #   scan-frontend:
 #     docker:
@@ -267,12 +284,12 @@ jobs:
 workflows:
   default:
     jobs:
-      - build-frontend
-      - build-backend
-      # - test-frontend:
-      #     requires: [build-frontend]
-      # - test-backend:
-      #     requires: [build-backend]
+      - Build-frontend
+      - Build-backend
+      - UnitTest-frontend:
+          requires: [Build-frontend]
+      - UnitTest-backend:
+          requires: [Build-backend]
       # - scan-backend:
       #     requires: [build-backend]
       # - scan-frontend:
