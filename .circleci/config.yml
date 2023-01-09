@@ -324,20 +324,9 @@ jobs:
     #       channel: qadry
     #       template: success_tagged_deployment_1
 
-    executor:
-      name: node/default
-    steps:
-      - checkout
-      - node/install-packages:
-         app-dir: ~/project/frontend
-      
-      - restore_cache:
-         keys: [frontend-pack]
-      - run:
-          name: SlackNotify-frontend
-          command: |
-            npm install
-            npm test
+    docker:
+      - image: cimg/node:13.8.0
+    steps:  
       - slack/notify:
           channel: qadry
           event: pass
