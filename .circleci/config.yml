@@ -2,7 +2,9 @@
 version: 2.1
 
 orbs:
-  slack: circleci/slack@4.29.149
+  slack: circleci/slack@4.12.0
+#Visit the link below to findout the version of the current slack orb
+#https://circleci.com/developer/orbs/orb/circleci/slack 
 
 commands:
   notifications_when_failure:
