@@ -1,6 +1,16 @@
                                     ########## UdaPeople Project By Mahmoud Qadry ###########
 version: 2.1
 
+orbs:
+  slack: circleci/slack@4.29.149
+
+commands:
+  notifications_when_failure:
+    steps:
+     - slack/notify:
+        event: fail
+        channel: qadry
+        template: basic_fail_1
 # commands:
 #   destroy-environment:
 #     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
@@ -49,6 +59,7 @@ jobs:
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-pack
+      - notifications_when_failure    
 
   Build-backend:
     docker:
@@ -66,6 +77,7 @@ jobs:
       - save_cache:
           paths: [backend/node_modules]
           key: backend-pack
+      - notifications_when_failure    
 
   UnitTest-frontend:
     docker:
@@ -80,6 +92,7 @@ jobs:
             cd frontend
             npm install
             npm test
+      - notifications_when_failure      
     
                 
   UnitTest-backend:
@@ -95,6 +108,7 @@ jobs:
              cd backend
              npm install
              npm test
+      - notifications_when_failure       
             
   Scan-frontend:
     docker:
@@ -111,6 +125,7 @@ jobs:
             npm audit fix
             npm audit fix --force --audit-level=critical
             npm audit --audit-level=critical
+      - notifications_when_failure      
 
   Scan-backend:
     docker:
@@ -130,6 +145,7 @@ jobs:
              npm audit fix --force --audit-level=critical
              npm audit fix --force --audit-level=critical
              npm audit --audit-level=critical
+      - notifications_when_failure       
       
 
 #   deploy-infrastructure:
@@ -296,7 +312,14 @@ jobs:
 #             then
 #               # your code here
 #             fi
-            
+  notifications_when_pass:
+    docker:
+      - image: cimage/base:satble
+    steps: 
+      - slack/notify:
+          event: pass
+          channel: qadry
+          template: success_tagged_deployment_1
 
 workflows:
   default:
@@ -307,10 +330,16 @@ workflows:
           requires: [Build-frontend]
       - UnitTest-backend:
           requires: [Build-backend]
+      - Scan-frontend:
+          requires: [Build-frontend]    
       - Scan-backend:
           requires: [Build-backend]
-      - Scan-frontend:
-          requires: [Build-frontend]
+      - notifications_when_pass:
+          requires:
+             - UnitTest-frontend 
+             - UnitTest-backend
+             - Scan-frontend
+             - Scan-backend
       # - deploy-infrastructure:
       #     requires: [test-frontend, test-backend, scan-frontend, scan-backend]
       #     filters:
