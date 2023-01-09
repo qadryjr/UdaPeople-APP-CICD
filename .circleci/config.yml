@@ -328,6 +328,9 @@ jobs:
       name: node/default
     steps:
       - checkout
+      - node/install-packages:
+         app-dir: ~/project/backend/
+
       - run:
           command: npm run deploy
       - slack/notify:
