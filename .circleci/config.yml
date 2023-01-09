@@ -68,7 +68,6 @@ jobs:
 
   UnitTest-frontend:
     docker:
-      docker:
       - image: cimg/node:13.8.0
     steps:
       - checkout
@@ -81,6 +80,7 @@ jobs:
             npm install
             npm test
     
+                
                 
   UnitTest-backend:
     docker:
