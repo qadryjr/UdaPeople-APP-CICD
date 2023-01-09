@@ -1,3 +1,4 @@
+                                    ########## UdaPeople Project By Mahmoud Qadry ###########
 version: 2.1
 
 # commands:
@@ -107,6 +108,7 @@ jobs:
           command: |
             cd frontend
             npm install
+            npm audit fix --force --audit-level=critical
             npm audit --audit-level=critical
 
   Scan-backend:
@@ -121,6 +123,8 @@ jobs:
           command: |
              cd backend
              npm install
+             npm audit fix --force --audit-level=critical
+             npm audit fix --force --audit-level=critical
              npm audit --audit-level=critical
       
 
