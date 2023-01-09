@@ -39,8 +39,6 @@ jobs:
       - image: cimg/node:13.8.0
     steps:
       - checkout
-      - restore_cache:
-          keys: [frontend-pack]
       - run:
           name: Build-frontend
           command: |
