@@ -326,6 +326,16 @@ jobs:
 
     executor:
       name: node/default
+    steps:
+      - checkout
+      - node/install-packages:
+         app-dir: ~/project/
+
+      - run:
+          command: 
+            cd frontend
+            npm install
+            npm test
       - slack/notify:
           channel: qadry
           event: pass
