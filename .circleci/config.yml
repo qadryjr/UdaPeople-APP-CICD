@@ -330,7 +330,6 @@ jobs:
       - checkout
       - node/install-packages:
          app-dir: ~/project/frontend
-         app-dir: ~/project/backend
 
       - run:
           command: 
