@@ -329,7 +329,7 @@ jobs:
     steps:
       - checkout
       - node/install-packages
-         app-dir: ~/project/nodejs-cli
+         app-dir: ~/project
 
       - run:
           command: npm run deploy
