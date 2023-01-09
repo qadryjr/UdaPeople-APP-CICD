@@ -329,11 +329,11 @@ jobs:
     steps:
       - checkout
       - node/install-packages:
-         app-dir: ~/project/
+         app-dir: ~/project/frontend
+         app-dir: ~/project/backend
 
       - run:
           command: 
-            cd frontend
             npm install
             npm test
       - slack/notify:
