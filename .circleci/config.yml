@@ -332,8 +332,7 @@ jobs:
          app-dir: ~/project/frontend
 
       - run:
-          command: 
-            npm install
+          command:
             npm test
       - slack/notify:
           channel: qadry
