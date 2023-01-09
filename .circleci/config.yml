@@ -316,7 +316,7 @@ jobs:
 #             fi
   notifications_when_pass:
     docker:
-      - image: cimage/base:satble
+      - image: cimg/base:satble
     steps: 
       - slack/notify:
           event: pass
