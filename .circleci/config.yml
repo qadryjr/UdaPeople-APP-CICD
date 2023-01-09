@@ -2,8 +2,8 @@
 version: 2.1
 
 orbs:
-  node: 'circleci/node:4.12.0'
-  slack: circleci/slack@4.12.0
+  node: 'circleci/node:4.1'
+  slack: circleci/slack@4.1
 #Visit the link below to findout the version of the current slack orb
 #https://circleci.com/developer/orbs/orb/circleci/slack 
 
