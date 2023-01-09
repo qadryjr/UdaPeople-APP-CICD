@@ -330,16 +330,13 @@ jobs:
       - checkout
       - node/install-packages:
          app-dir: ~/project/frontend
-      - run: |
-          if [ -e yarn.lock ]; then
-          yarn install --frozen-lockfile
-          elif [ -e package-lock.json ]; then
-          npm ci
-          else
-          npm i
-          fi
+      
+      - restore_cache:
+         keys: [frontend-pack]
       - run:
-          command:
+          name: SlackNotify-frontend
+          command: |
+            npm install
             npm test
       - slack/notify:
           channel: qadry
