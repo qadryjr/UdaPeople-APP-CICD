@@ -1,0 +1,32 @@
+---
+- name: "Create a Directory for the Backend"
+  file: 
+    path: ~/Qadry-Backend-APP 
+    state: directory 
+
+- name: "Decompress Backend Files"
+  unarchive: 
+    src: artifact.tar.gz
+    dest: ~/Qadry-Backend-APP 
+
+- name: "Install NodeJS dependencies"
+  shell:
+    cd ~/Qadry-Backend-APP
+    npm install
+
+- name: "Run the APP with PM2"
+  shell: |
+    cd ~/Qadry-Backend-APP/dist 
+    pm2 stop default
+    pm2 start main.js 
+
+  register: execute_node
+
+- name: "Print a message"
+  debug:
+    msg" "{{ execute_node.stdout_lines }}"        
+
+- name: "Start The Service with PM2"
+  become: true
+  shell: |
+     env PATH=$PATH:/usr/local/bin pm2 startup systemd -u ubuntu --hp /home/ubuntu    
