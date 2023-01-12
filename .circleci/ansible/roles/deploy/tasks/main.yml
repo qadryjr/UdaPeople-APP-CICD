@@ -24,7 +24,7 @@
 
 - name: "Print a message"
   debug:
-    msg" "{{ execute_node.stdout_lines }}"        
+    msg: "{{ execute_node.stdout_lines }}"        
 
 - name: "Start The Service with PM2"
   become: true
