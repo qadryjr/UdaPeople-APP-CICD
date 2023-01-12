@@ -229,9 +229,9 @@ jobs:
       - checkout
       #Install dependencies
       - install_ansible
-      - Add_Fingerprint_for_ssh_keys:
+      - add_fingerprint_for_ssh_keys:
           fingerprints: ["69:8e:25:11:49:9f:c7:96:ff:d4:30:9a:a0:51:20:a2"]
-      - Attach_workspace:
+      - attach_workspace:
           at: ~/
       - run:
           name: Configure server
@@ -239,7 +239,7 @@ jobs:
             cd .circleci/ansible
             cat inventory.txt
             ansible-playbook -i inventory configure-server.yml
-            
+      - destroy_environment      
       # Here's where you will add some code to rollback on failure      
 
 #   run-migrations:
