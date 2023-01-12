@@ -183,7 +183,7 @@ jobs:
               --template-file .circleci/files/backend.yml \
               --tags project=Qadry-Udapeople \
               --stack-name "UdaPeople-Backend-${CIRCLE_WORKFLOW_ID:0:5}" \
-              --parameter-overrides ID="your workflow id"  
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:5}"  
               
       - run:
           name: Ensure front-end infrastructure exist
@@ -192,7 +192,7 @@ jobs:
               --template-file .circleci/files/frontend.yml \
               --tags project=Qadry-Udapeople \
               --stack-name "UdaPeople-Frontend-${CIRCLE_WORKFLOW_ID:0:5}" \
-              --parameter-overrides ID="your workflow id"  
+              --parameter-overrides ID="${CIRCLE_WORKFLOW_ID:0:5}"  
               
       - run:
           name: Add back-end ip to ansible inventory
