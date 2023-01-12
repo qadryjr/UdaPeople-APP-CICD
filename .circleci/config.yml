@@ -15,7 +15,7 @@ commands:
         channel: qadry
         template: basic_fail_1
 
-  Install_AWSCLI:
+  install_awscli:
     steps:
      - run:
          name: Install AWSCLI
@@ -24,7 +24,7 @@ commands:
                unzip awscliv2.zip
             sudo ./aws/install
 
-  Install_Ansible:
+  install_ansible:
     steps:
      - run:
          name: Install Ansible on Ubuntu based
@@ -175,7 +175,7 @@ jobs:
       - image: cimg/base:stable
     steps:
       - checkout
-      - Install_AWSCLI
+      - install_awscli
       - run:
           name: Ensure back-end infrastructure exists
           command: |
