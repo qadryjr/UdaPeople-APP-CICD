@@ -175,11 +175,11 @@ jobs:
       - image: cimg/base:stable
     steps:
       - checkout
-      - install_awscli
+      - Install_AWSCLI
       - run:
           name: Ensure back-end infrastructure exists
           command: |
-            aws cloudformation deploy \
+            aws cloudformation deploy 
               --template-file .circleci/files/backend.yml \
               --tags project=Qadry-Udapeople \
               --stack-name "UdaPeople-Backend-${CIRCLE_WORKFLOW_ID:0:5}" \
