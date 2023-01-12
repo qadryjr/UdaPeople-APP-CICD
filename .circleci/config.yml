@@ -246,14 +246,14 @@ jobs:
           name: Run migrations
           command: |
             cd backend
-            npm run migrations > migrations_qadry.txt
-            cat migrations_qadry.txt 
+            npm run migrations > migrations_dump.txt
+            cat migrations_dump.txt 
       - run:
           name: Send migration results to kvdb.io site
           command: |
-            cat ~/project/backend/migrations_qadry.txt
+            cat ~/project/backend/migrations_dump.txt
 
-            if grep -q "success" ./backend/migrations_qadry.txt
+            if grep -q "success" ~/backend/migrations_dump.txt
             then 
               curl --insecure https://kvdb.io/${QADRY_KVDB_BUCKET}/migration_${CIRCLE_WORKFLOW_ID:0:5} -d '1'
             else
