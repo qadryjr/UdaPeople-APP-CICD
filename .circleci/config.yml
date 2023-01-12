@@ -14,6 +14,25 @@ commands:
         event: fail
         channel: qadry
         template: basic_fail_1
+
+  Install_AWSCLI:
+    steps:
+     - run:
+         name: Install AWSCLI
+         command: |
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+               unzip awscliv2.zip
+            sudo ./aws/install
+
+  Install_Ansible:
+    steps:
+     - run:
+         name: Install Ansible on Ubuntu based
+         command: |
+            sudo apt update
+            sudo apt install software-properties-common
+            sudo add-apt-repository --yes --update ppa:ansible/ansible
+            sudo apt install ansible                   
 # commands:
 #   destroy-environment:
 #     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
@@ -151,39 +170,46 @@ jobs:
       - notifications_when_failure       
       
 
-#   deploy-infrastructure:
-#     docker:
-#       # Docker image here that supports AWS CLI
-#     steps:
-#       # Checkout code from git
-#       - run:
-#           name: Ensure back-end infrastructure exists
-#           command: |
-#             aws cloudformation deploy \
-#               --template-file .circleci/files/backend.yml \
-#               #--tags project=your-tag \
-#               # --stack-name "your back-end stack name with workflow id" \
-#               # --parameter-overrides ID="your workflow id"  
-#               exit 1
-#       - run:
-#           name: Ensure front-end infrastructure exist
-#           command: |
-#             aws cloudformation deploy \
-#               --template-file .circleci/files/frontend.yml \
-#               #--tags project=your-tag \
-#               # --stack-name "your front-end stack name with workflow id" \
-#               # --parameter-overrides ID="your workflow id"  
-#               exit 1
-#       - run:
-#           name: Add back-end ip to ansible inventory
-#           command: |
-#             # Your code here
-#             exit 1
-#       - persist_to_workspace:
-#           root: ~/
-#           paths:
-#             - project/.circleci/ansible/inventory.txt
-#       # Here's where you will add some code to rollback on failure      
+  deploy-infrastructure:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - install_awscli
+      - run:
+          name: Ensure back-end infrastructure exists
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/backend.yml \
+              --tags project=Qadry-Udapeople \
+              --stack-name "UdaPeople-Backend-${CIRCLE_WORKFLOW_ID:0:5}" \
+              --parameter-overrides ID="your workflow id"  
+              
+      - run:
+          name: Ensure front-end infrastructure exist
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/frontend.yml \
+              --tags project=Qadry-Udapeople \
+              --stack-name "UdaPeople-Frontend-${CIRCLE_WORKFLOW_ID:0:5}" \
+              --parameter-overrides ID="your workflow id"  
+              
+      - run:
+          name: Add back-end ip to ansible inventory
+          command: |
+            BACKEND_PUBLIC_IP=$(aws ec2 describe-instances \
+            --filters "Name=tag:Name,Values=backend-${CIRCLE_WORKFLOW_ID:0:5}"
+            --query 'Reservations[*].Instances[*].PublicIpAddress'
+            --output qadry.txt)
+
+            echo $BACKEND_PUBLIC_IP >> .circleci/ansible/inventory.txt
+            cat .circleci/ansible/inventory.txt
+
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - project/.circleci/ansible/inventory.txt
+      # Here's where you will add some code to rollback on failure      
 
 #   configure-infrastructure:
 #     docker:
@@ -316,14 +342,6 @@ jobs:
 #               # your code here
 #             fi
   notifications_when_pass:
-    # docker:
-    #   - image: cimg/base:2023.01
-    # steps: 
-    #   - slack/notify:
-    #       event: pass
-    #       channel: qadry
-    #       template: success_tagged_deployment_1
-
     docker:
       - image: cimg/node:13.8.0
     steps:  
@@ -333,7 +351,7 @@ jobs:
           template: success_tagged_deploy_1   
 
 workflows:
-  Qadry:
+  Qadry Workflow:
     jobs:
       - Build-frontend
       - Build-backend
