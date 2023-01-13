@@ -10,7 +10,7 @@
     dest: ~/Qadry-Backend-APP 
 
 - name: "Install NodeJS dependencies"
-  shell:
+  shell: |
     cd ~/Qadry-Backend-APP
     npm install
 
