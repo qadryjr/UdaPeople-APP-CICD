@@ -385,20 +385,31 @@ jobs:
       - destroy_environment
       - revert-migrations 
 
-#   cloudfront-update:
-#     docker:
-#       # Docker image here that supports AWS CLI
-#     steps:
-#       # Checkout code from git
-#       - run:
-#           name: Install dependencies
-#           command: |
-#             # your code here
-#       - run:
-#           name: Update cloudfront distribution
-#           command: |
-#             # your code here
-#       # Here's where you will add some code to rollback on failure  
+  Cloudfront-Update:
+    docker:
+      - image: cimg/base:stable
+    steps:
+      - checkout
+      - install_awscli
+      - install_nodejs
+
+      - run:
+          name: Saving the old workflowID to kvdb Bucket
+          command: |
+            export OLD_WORKFLOW_ID=$(aws cloudformation \
+                       list-exports --query "Exports[?Name==\`workflowID\`].Value" \
+                       --no-paginate --output text)
+
+            echo "Old WorkflowID: $OLD_WORKFLOW_ID"
+            curl https://kvdb.io/${QADRY_KVDB_BUCKET}/OLD_WORKFLOW_ID -d "${OLD_WORKFLOW_ID}"  
+      - run:
+          name: Update cloudfront distribution
+          command: |
+            aws cloudformation deploy \
+              --template-file .circleci/files/cloudfront.yml \
+              --tags project=Qadry-Udapeople \
+              --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:5}" \
+              --stack-name udapeople-cloudfront
 
 # cleanup:
 #     docker:
@@ -461,7 +472,7 @@ workflows:
           requires: [Run-Migrations]
       - Smoke-Test:
           requires: [Deploy-Backend, Deploy-Frontend]
-      # - cloudfront-update:
-      #     requires: [smoke-test]
+      - Cloudfront-Update:
+          requires: [Smoke-Test]
       # - cleanup:
       #     requires: [cloudfront-update]
