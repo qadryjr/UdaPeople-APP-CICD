@@ -63,7 +63,8 @@ commands:
           when: on_fail
           command: |
             SUCCESSFULLY_MIGRATED=$(curl --insecure https://kvdb.io/${QADRY_KVDB_BUCKET}/migration_${CIRCLE_WORKFLOW_ID})
-            if (( $SUCCESSFULLY_MIGRATED == 1));
+            echo $SUCCESSFULLY_MIGRATED
+            if (($SUCCESSFULLY_MIGRATED == 1));
             then
               cd ~/project/backend
               npm install
@@ -77,6 +78,8 @@ jobs:
       - image: cimg/node:13.8.0
     steps:
       - checkout
+      - restore_cache
+          keys: [frontend-deps]
       - run:
           name: Build-frontend
           command: |
@@ -85,7 +88,7 @@ jobs:
             npm run build
       - save_cache:
           paths: [frontend/node_modules]
-          key: frontend-pack
+          key: frontend-deps
       - notifications_when_failure    
 
   Build-backend:
@@ -94,7 +97,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [backend-pack]
+          keys: [backend-deps]
       - run:
           name: Build-backend
           command: |
@@ -103,7 +106,7 @@ jobs:
              npm run build
       - save_cache:
           paths: [backend/node_modules]
-          key: backend-pack
+          key: backend-deps
       - notifications_when_failure    
 
   UnitTest-frontend:
@@ -112,7 +115,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [frontend-pack]
+          keys: [frontend-deps]
       - run:
           name: UnitTest-frontend
           command: |
@@ -128,7 +131,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [backend-pack]
+          keys: [backend-deps]
       - run:
           name: UnitTest-backend
           command: |
@@ -143,7 +146,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [frontend-pack]
+          keys: [frontend-deps]
       - run:
           name: Scan-frontend
           command: |
@@ -160,7 +163,7 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          keys: [backend-pack]
+          keys: [backend-deps]
       - run:
           name: Scan-backend
           command: |
@@ -224,6 +227,7 @@ jobs:
       - checkout
       #Install dependencies
       - install_ansible
+      - install_awscli
       - add_ssh_keys:
           fingerprints: ["69:8e:25:11:49:9f:c7:96:ff:d4:30:9a:a0:51:20:a2"]
       - attach_workspace:
@@ -254,8 +258,8 @@ jobs:
           name: Send migration results to kvdb.io site
           command: |
             cat ~/project/backend/migrations_dump.txt
-
-            if grep -q "success" ~/backend/migrations_dump.txt
+#No migrations are pending instead of success
+            if grep -q "success" ~/project/backend/migrations_dump.txt
             then 
               curl --insecure https://kvdb.io/${QADRY_KVDB_BUCKET}/migration_${CIRCLE_WORKFLOW_ID:0:5} -d '1'
             else
@@ -278,7 +282,6 @@ jobs:
           command: |
             cd frontend
             npm install
-            npm run build
       - run:
           name: Get backend url
           command: |
