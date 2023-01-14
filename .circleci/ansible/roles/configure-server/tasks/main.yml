@@ -1,15 +1,11 @@
 ---
-- name: "Download Node.JS"
+- name: "Download and Install Node.JS 13.8.0"
   become: true
   shell: |
-    curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash 
-
-- name: "Install Node.JS"
-  become: true
-  apt:
-     name: ["nodejs"]
-     state: latest
-     update_cache: yes
+    curl -sL https://deb.nodesource.com/setup_lts.x | sudo -E bash 
+    sudo apt install -y nodejs
+    sudo npm install -g n
+    sudo n 13.8.0
 
 - name: "Install pm2"
   npm:
